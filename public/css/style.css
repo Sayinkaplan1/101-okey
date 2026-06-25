@@ -4,11 +4,11 @@
 
 /* ── CSS Değişkenleri ── */
 :root {
-  /* Arka plan & Masa */
-  --bg-dark: #0a1f0a;
-  --bg-light: #1a3a1a;
-  --table-green: #1b5e20;
-  --table-border: #2e7d32;
+  /* Arka plan & Masa (Mavi Tema) */
+  --bg-dark: #001224;
+  --bg-light: #063970;
+  --table-green: #154c79;
+  --table-border: #1e81b0;
 
   /* Panel / Cam efekti */
   --glass-bg: rgba(255, 255, 255, 0.07);
@@ -36,11 +36,11 @@
   --text-muted: rgba(232, 232, 232, 0.35);
 
   /* Butonlar */
-  --btn-primary: linear-gradient(135deg, #2e7d32, #1b5e20);
-  --btn-primary-hover: linear-gradient(135deg, #388e3c, #2e7d32);
+  --btn-primary: linear-gradient(135deg, #1e81b0, #154c79);
+  --btn-primary-hover: linear-gradient(135deg, #289dc6, #1e81b0);
   --btn-danger: linear-gradient(135deg, #c62828, #b71c1c);
   --btn-accent: linear-gradient(135deg, #f9a825, #f57f17);
-  --btn-success: linear-gradient(135deg, #2e7d32, #1b5e20);
+  --btn-success: linear-gradient(135deg, #1e81b0, #154c79);
   --btn-gold: linear-gradient(135deg, #ffd700, #ffab00);
 
   /* Boyutlar */
@@ -88,15 +88,15 @@ body {
   position: relative;
 }
 
-/* Masa dokusu — zarif radyal desenler */
+/* Masa dokusu — mavi radyal desenler */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 120% 80% at 50% 55%, rgba(27, 94, 32, 0.35) 0%, transparent 70%),
-    radial-gradient(circle at 20% 30%, rgba(46, 125, 50, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(46, 125, 50, 0.1) 0%, transparent 40%);
+    radial-gradient(ellipse 120% 80% at 50% 55%, rgba(21, 76, 121, 0.5) 0%, transparent 70%),
+    radial-gradient(circle at 20% 30%, rgba(30, 129, 176, 0.25) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(30, 129, 176, 0.2) 0%, transparent 40%);
   pointer-events: none;
   z-index: 0;
 }
@@ -551,18 +551,17 @@ body::after {
 
 .table-player {
   position: absolute;
-  background: var(--glass-bg);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(0, 0, 0, 0.6); /* Daha koyu ve opak, glass değil */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px; /* Daha köşeli */
+  padding: 4px 12px;
   transition: var(--transition-base);
-  min-height: 80px;
+  min-height: 40px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 5;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 .table-player.is-turn {
   border-color: var(--accent-gold);
@@ -592,8 +591,8 @@ body::after {
 .op-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 12px;
+  margin-bottom: 0;
 }
 .op-avatar {
   font-size: 1.3rem;
@@ -684,20 +683,28 @@ body::after {
   border: 1px solid var(--accent-gold);
 }
 
-/* ── Masa Merkezi ── */
+/* ── Masa Merkezi Izgarası ── */
 .table-center-board {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: var(--spacing-xl);
-  padding: var(--spacing-lg) var(--spacing-md);
-  background: rgba(0,0,0,0.2);
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.05);
+  padding: var(--spacing-lg) 60px;
+  background: rgba(10, 30, 60, 0.5);
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+  width: 65%;
+  height: 50%;
+  
+  /* Grid pattern (Kareli zemin) */
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
 }
 
 .center-item {
@@ -976,30 +983,72 @@ body::after {
   width: 100%;
 }
 
-/* Taş rafı */
-.tile-rack-wrapper {
+/* ── Istaka / Yan Butonlar (Ahşap Tema) ── */
+.tile-rack-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
   width: 100%;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  padding: var(--spacing-sm) 0;
+}
 
+.side-btn-action {
+  width: 60px;
+  height: 80px;
+  background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+  border: 2px solid #3a7bd5;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+  padding: 4px;
+}
+.side-btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+}
+.side-btn-icon {
+  background: white;
+  color: black;
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 0.7rem;
+  margin-bottom: 6px;
+  display: inline-block;
+  white-space: nowrap;
+}
+.side-btn-text {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.tile-rack-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  /* Ahşap görünüm */
+  background: linear-gradient(to bottom, #8d5524 0%, #c68e58 10%, #8d5524 50%, #603813 51%, #a67c52 100%);
+  border-radius: 8px;
+  border-bottom: 6px solid #4a280e;
+  border-top: 2px solid #e1b48b;
+  box-shadow: inset 0 5px 15px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.5);
+  padding: 10px 15px;
 }
 
 .tile-rack {
   display: flex;
   flex-wrap: wrap;
+  gap: 4px;
   justify-content: center;
-  gap: 10px 6px;
-  padding: var(--spacing-md);
-  background: var(--glass-bg);
-  backdrop-filter: blur(14px);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  min-height: 160px;
-  align-items: flex-start;
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
+  min-height: 140px; /* Çift katlı görünüm için yüksek */
 }
 
 /* Kontrol çubuğu */

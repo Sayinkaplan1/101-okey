@@ -99,21 +99,15 @@ class Renderer {
 
       slot.querySelector('.op-name').textContent = player.name || `Oyuncu ${absIdx + 1}`;
       
-      const tileCount = player.tileCount || 0;
-      slot.querySelector('.op-tile-count').textContent = tileCount;
+      const tileCount = player.tileCount || 21;
+      slot.querySelector('.op-tile-count').textContent = tileCount + ' Taş';
 
       if (this.app.currentTurn === absIdx) {
         slot.classList.add('is-turn');
       }
 
       const tilesContainer = slot.querySelector('.op-tiles');
-      tilesContainer.innerHTML = '';
-      const showCount = Math.min(tileCount, 18);
-      for (let t = 0; t < showCount; t++) {
-        const miniBack = document.createElement('div');
-        miniBack.className = 'mini-tile-back';
-        tilesContainer.appendChild(miniBack);
-      }
+      if (tilesContainer) tilesContainer.innerHTML = ''; // Artık kapalı taşları çizmiyoruz, sadece sayısını yazıyoruz.
 
       const openSetsContainer = slot.querySelector('.op-open-sets');
       openSetsContainer.innerHTML = '';

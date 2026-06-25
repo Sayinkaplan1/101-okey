@@ -113,12 +113,8 @@ class App {
       this.discardPiles = data.discardPiles || [[], [], [], []];
       this.openSets    = {};
 
-      // Oyuncu taş sayılarını ayarla
-      this.players.forEach((p, idx) => {
-        if (idx !== this.playerIndex) {
-          p.tileCount = 14;
-        }
-      });
+      // Oyuncu taş sayılarını sunucudan gelenle senkronize tutuyoruz.
+      // Sunucu gameStarted ve tileDrawn, tileDiscarded eventlerinde tileCount gönderiyor.
 
       // Ekranı değiştir
       this.showScreen('game');
@@ -186,7 +182,7 @@ class App {
         if (discarderIdx >= 0 && this.players[discarderIdx]) {
           this.players[discarderIdx].tileCount = Math.max(
             0,
-            (this.players[discarderIdx].tileCount || 14) - 1
+            (this.players[discarderIdx].tileCount || 21) - 1
           );
         }
       }

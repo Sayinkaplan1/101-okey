@@ -213,11 +213,26 @@
         </button>
       </div>
 
-      <!-- Taş Rafı -->
-      <div class="tile-rack-wrapper">
-        <div class="tile-rack" id="tile-rack">
-          <!-- Taşlar buraya render edilecek -->
+      <!-- Taş Rafı (Istaka) ve Yan Butonlar -->
+      <div class="tile-rack-container">
+        <!-- Sol Yan Buton (Seri Diz) -->
+        <button id="btn-sort-number" class="btn btn-side-action">
+          <span class="side-btn-icon">1 2 3</span>
+          <span class="side-btn-text">SERİ DİZ</span>
+        </button>
+
+        <!-- Istaka -->
+        <div class="tile-rack-wrapper">
+          <div class="tile-rack" id="tile-rack">
+            <!-- Taşlar buraya render edilecek -->
+          </div>
         </div>
+
+        <!-- Sağ Yan Buton (Çift Diz) -->
+        <button id="btn-sort-color" class="btn btn-side-action">
+          <span class="side-btn-icon">5 5</span>
+          <span class="side-btn-text">ÇİFT DİZ</span>
+        </button>
       </div>
 
       <!-- Kontrol Butonları -->
@@ -247,15 +262,6 @@
           </button>
           <button id="btn-finish-turn" class="btn btn-action btn-success" disabled>
             <span class="btn-label">✅ Sırayı Bitir</span>
-          </button>
-        </div>
-
-        <div class="controls-group controls-sort">
-          <button id="btn-sort-color" class="btn btn-sm btn-ghost">
-            🎨 Renge Göre
-          </button>
-          <button id="btn-sort-number" class="btn btn-sm btn-ghost">
-            🔢 Sayıya Göre
           </button>
         </div>
       </div>
