@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>101 Okey — Çevrimiçi Türk Taş Oyunu</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════  TOAST CONTAINER  ═══════════════ -->
+  <div id="toast-container"></div>
+
+  <!-- ═══════════════  LOBBY SCREEN  ═══════════════ -->
+  <section id="lobby" class="screen active">
+
+    <!-- Dekoratif arka plan parçacıkları -->
+    <div class="lobby-particles">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+    </div>
+
+    <div class="lobby-wrapper">
+      <!-- Logo / Başlık -->
+      <div class="lobby-logo">
+        <div class="logo-icon">
+          <div class="logo-tile t-yellow">1</div>
+          <div class="logo-tile t-blue">0</div>
+          <div class="logo-tile t-red">1</div>
+        </div>
+        <h1 class="logo-title">OKEY</h1>
+        <p class="logo-subtitle">Çevrimiçi Türk Taş Oyunu</p>
+      </div>
+
+      <!-- ── Giriş Formu ── -->
+      <div id="lobby-form" class="glass-panel lobby-panel">
+        <div class="input-group">
+          <label for="player-name">Oyuncu Adınız</label>
+          <input
+            type="text"
+            id="player-name"
+            placeholder="Adınızı girin…"
+            maxlength="16"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="lobby-buttons">
+          <button id="btn-create-room" class="btn btn-primary btn-lg">
+            <span class="btn-icon">＋</span> Oda Oluştur
+          </button>
+          <button id="btn-show-join" class="btn btn-secondary btn-lg">
+            <span class="btn-icon">→</span> Odaya Katıl
+          </button>
+        </div>
+
+        <!-- Oda kodunu girme alanı (başlangıçta gizli) -->
+        <div id="join-section" class="join-section hidden">
+          <div class="input-group">
+            <label for="room-code-input">Oda Kodu</label>
+            <input
+              type="text"
+              id="room-code-input"
+              placeholder="Örn: ABCD12"
+              maxlength="8"
+              autocomplete="off"
+              style="text-transform: uppercase"
+            />
+          </div>
+          <button id="btn-join-room" class="btn btn-accent btn-lg">
+            Odaya Katıl
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Bekleme Odası ── -->
+      <div id="waiting-room" class="glass-panel lobby-panel hidden">
+        <h2 class="waiting-title">Bekleme Odası</h2>
+
+        <div class="room-code-display">
+          <span class="room-code-label">Oda Kodu</span>
+          <div class="room-code-value" id="room-code-display">
+            <span id="room-code-text">----</span>
+            <button id="btn-copy-code" class="btn-icon-only" title="Kopyala">📋</button>
+          </div>
+        </div>
+
+        <div class="players-section">
+          <h3>Oyuncular <span id="player-count-badge" class="badge">0/4</span></h3>
+          <ul id="player-list" class="player-list">
+            <!-- Dinamik olarak doldurulacak -->
+          </ul>
+        </div>
+
+        <button id="btn-start-game" class="btn btn-primary btn-lg hidden">
+          🎮 Oyunu Başlat
+        </button>
+
+        <p id="waiting-hint" class="waiting-hint">
+          Ev sahibi oyunu başlatmayı bekliyor…
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════  GAME SCREEN  ═══════════════ -->
+  <section id="game" class="screen">
+    <!-- ── ÜST ALAN: Diğer Oyuncular ── -->
+    <div class="other-players-area">
+      <div class="other-player" id="opponent-left">
+        <div class="op-header">
+          <div class="op-avatar">👤</div>
+          <span class="op-name">—</span>
+          <span class="op-tile-count badge">0</span>
+          <div class="op-turn-dot"></div>
+        </div>
+        <div class="op-tiles"></div>
+        <div class="op-open-sets"></div>
+      </div>
+
+      <div class="other-player" id="opponent-top">
+        <div class="op-header">
+          <div class="op-avatar">👤</div>
+          <span class="op-name">—</span>
+          <span class="op-tile-count badge">0</span>
+          <div class="op-turn-dot"></div>
+        </div>
+        <div class="op-tiles"></div>
+        <div class="op-open-sets"></div>
+      </div>
+
+      <div class="other-player" id="opponent-right">
+        <div class="op-header">
+          <div class="op-avatar">👤</div>
+          <span class="op-name">—</span>
+          <span class="op-tile-count badge">0</span>
+          <div class="op-turn-dot"></div>
+        </div>
+        <div class="op-tiles"></div>
+        <div class="op-open-sets"></div>
+      </div>
+    </div>
+
+    <!-- ── ORTA ALAN: Masa Merkezi ── -->
+    <div class="table-center">
+      <!-- Çekme Destesi -->
+      <div class="center-item draw-pile" id="draw-pile">
+        <div class="pile-stack">
+          <div class="pile-tile"></div>
+          <div class="pile-tile"></div>
+          <div class="pile-tile"></div>
+        </div>
+        <span class="pile-count-badge" id="pile-count">0</span>
+        <span class="pile-label">Çekme Destesi</span>
+      </div>
+
+      <!-- Gösterge Taşı -->
+      <div class="center-item indicator-section">
+        <div class="indicator-tile-wrapper" id="indicator-tile">
+          <!-- Renderer dolduracak -->
+        </div>
+        <span class="indicator-label">Gösterge</span>
+      </div>
+
+      <!-- Okey Bilgisi -->
+      <div class="center-item okey-info-section" id="okey-info">
+        <div class="okey-info-tile" id="okey-info-tile">
+          <!-- Renderer dolduracak -->
+        </div>
+        <span class="okey-label">Okey (Joker)</span>
+      </div>
+
+      <!-- Atma Destesi -->
+      <div class="center-item discard-pile" id="discard-pile">
+        <div class="discard-top" id="discard-top">
+          <span class="discard-empty">Boş</span>
+        </div>
+        <span class="discard-label">Atılan Taşlar</span>
+      </div>
+    </div>
+
+    <!-- ── Sıra Göstergesi ── -->
+    <div class="turn-indicator" id="turn-indicator">
+      <div class="turn-dot-pulse"></div>
+      <span id="turn-text">—</span>
+    </div>
+
+    <!-- ── ALT ALAN: Oyuncu Bölgesi ── -->
+    <div class="player-area">
+      <!-- Per Hazırlık Alanı (El açmadan önce perler gruplanır) -->
+      <div id="staging-area" class="staging-area hidden">
+        <div class="staging-header">
+          <h3>📦 Per Hazırlığı</h3>
+          <div class="staging-actions">
+            <button id="btn-add-set" class="btn btn-sm btn-accent">＋ Per Ekle</button>
+            <button id="btn-clear-staging" class="btn btn-sm btn-ghost">Temizle</button>
+          </div>
+        </div>
+        <div id="staged-sets" class="staged-sets">
+          <!-- Per grupları burada gösterilecek -->
+        </div>
+        <button id="btn-submit-open" class="btn btn-primary btn-lg">
+          ✋ Perleri Onayla ve El Aç
+        </button>
+      </div>
+
+      <!-- Taş Rafı -->
+      <div class="tile-rack-wrapper">
+        <div class="tile-rack" id="tile-rack">
+          <!-- Taşlar buraya render edilecek -->
+        </div>
+      </div>
+
+      <!-- Kontrol Butonları -->
+      <div class="controls-bar">
+        <div class="controls-group controls-main">
+          <button id="btn-draw-pile" class="btn btn-action" disabled>
+            <span class="btn-label">📥 Taş Çek</span>
+            <span class="btn-hint">Desteden</span>
+          </button>
+          <button id="btn-draw-discard" class="btn btn-action" disabled>
+            <span class="btn-label">♻️ Yerdekini Al</span>
+            <span class="btn-hint">Atılan taş</span>
+          </button>
+          <button id="btn-discard" class="btn btn-action btn-danger" disabled>
+            <span class="btn-label">🗑️ Taş At</span>
+            <span class="btn-hint">Seçili taşı</span>
+          </button>
+        </div>
+
+        <div class="controls-group controls-sets">
+          <button id="btn-open-hand" class="btn btn-action btn-gold" disabled>
+            <span class="btn-label">✋ El Aç</span>
+          </button>
+          <button id="btn-lay-tile" class="btn btn-action" disabled>
+            <span class="btn-label">📤 İşle</span>
+            <span class="btn-hint">Pere ekle</span>
+          </button>
+          <button id="btn-finish-turn" class="btn btn-action btn-success" disabled>
+            <span class="btn-label">✅ Sırayı Bitir</span>
+          </button>
+        </div>
+
+        <div class="controls-group controls-sort">
+          <button id="btn-sort-color" class="btn btn-sm btn-ghost">
+            🎨 Renge Göre
+          </button>
+          <button id="btn-sort-number" class="btn btn-sm btn-ghost">
+            🔢 Sayıya Göre
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Açık Perlerim -->
+    <div id="my-open-sets" class="my-open-sets">
+      <!-- Renderer tarafından doldurulacak -->
+    </div>
+  </section>
+
+  <!-- ═══════════════  ROUND END MODAL  ═══════════════ -->
+  <div id="round-end-modal" class="modal-overlay hidden">
+    <div class="modal glass-panel">
+      <div class="modal-header">
+        <h2>🏆 El Sona Erdi!</h2>
+      </div>
+      <div class="modal-body">
+        <p class="winner-text" id="modal-winner">—</p>
+        <table class="score-table" id="score-table">
+          <thead>
+            <tr>
+              <th>Oyuncu</th>
+              <th>Bu El</th>
+              <th>Toplam</th>
+            </tr>
+          </thead>
+          <tbody id="score-tbody">
+            <!-- Dinamik -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-new-round" class="btn btn-primary btn-lg">
+          🔄 Yeni El
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════  LAY TILE MODAL  ═══════════════ -->
+  <div id="lay-tile-modal" class="modal-overlay hidden">
+    <div class="modal glass-panel modal-lay">
+      <div class="modal-header">
+        <h2>📤 Taş İşle — Hedef Per Seçin</h2>
+        <button class="modal-close" id="btn-close-lay-modal">✕</button>
+      </div>
+      <div class="modal-body" id="lay-targets">
+        <!-- Açık perler listelenir -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════  SCRIPTS  ═══════════════ -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/tileUI.js"></script>
+  <script src="js/lobby.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
