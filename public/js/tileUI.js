@@ -283,8 +283,8 @@ class TileUI {
         this.drawTile('pile');
       }
     });
-    // Atma destesine tıklama
-    document.getElementById('discard-pile')?.addEventListener('click', () => {
+    // Atma destesine tıklama (Sadece solumuzdaki desteden çekebiliriz)
+    document.getElementById('discard-pile-3')?.addEventListener('click', () => {
       if (this.app.currentTurn === this.app.playerIndex && !this.app.hasDrawn) {
         this.drawTile('discard');
       }

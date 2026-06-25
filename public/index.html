@@ -115,9 +115,9 @@
 
   <!-- ═══════════════  GAME SCREEN  ═══════════════ -->
   <section id="game" class="screen">
-    <!-- ── ÜST ALAN: Diğer Oyuncular ── -->
-    <div class="other-players-area">
-      <div class="other-player" id="opponent-left">
+    <div class="table-container">
+      <!-- ── ÜST OYUNCU ── -->
+      <div class="table-player pos-top" id="player-top">
         <div class="op-header">
           <div class="op-avatar">👤</div>
           <span class="op-name">—</span>
@@ -128,7 +128,8 @@
         <div class="op-open-sets"></div>
       </div>
 
-      <div class="other-player" id="opponent-top">
+      <!-- ── SOL OYUNCU ── -->
+      <div class="table-player pos-left" id="player-left">
         <div class="op-header">
           <div class="op-avatar">👤</div>
           <span class="op-name">—</span>
@@ -139,7 +140,8 @@
         <div class="op-open-sets"></div>
       </div>
 
-      <div class="other-player" id="opponent-right">
+      <!-- ── SAĞ OYUNCU ── -->
+      <div class="table-player pos-right" id="player-right">
         <div class="op-header">
           <div class="op-avatar">👤</div>
           <span class="op-name">—</span>
@@ -149,43 +151,40 @@
         <div class="op-tiles"></div>
         <div class="op-open-sets"></div>
       </div>
-    </div>
 
-    <!-- ── ORTA ALAN: Masa Merkezi ── -->
-    <div class="table-center">
-      <!-- Çekme Destesi -->
-      <div class="center-item draw-pile" id="draw-pile">
-        <div class="pile-stack">
-          <div class="pile-tile"></div>
-          <div class="pile-tile"></div>
-          <div class="pile-tile"></div>
+      <!-- ── MERKEZ (Çekme Destesi & Gösterge) ── -->
+      <div class="table-center-board">
+        <div class="center-item draw-pile" id="draw-pile">
+          <div class="pile-stack">
+            <div class="pile-tile"></div>
+            <div class="pile-tile"></div>
+            <div class="pile-tile"></div>
+          </div>
+          <span class="pile-count-badge" id="pile-count">0</span>
         </div>
-        <span class="pile-count-badge" id="pile-count">0</span>
-        <span class="pile-label">Çekme Destesi</span>
+        
+        <div class="center-item indicator-section">
+          <div class="indicator-tile-wrapper" id="indicator-tile"></div>
+        </div>
+
+        <div class="center-item okey-info-section" id="okey-info">
+          <div class="okey-info-tile" id="okey-info-tile"></div>
+        </div>
       </div>
 
-      <!-- Gösterge Taşı -->
-      <div class="center-item indicator-section">
-        <div class="indicator-tile-wrapper" id="indicator-tile">
-          <!-- Renderer dolduracak -->
-        </div>
-        <span class="indicator-label">Gösterge</span>
+      <!-- ── ÇÖP YIĞINLARI (4 Adet) ── -->
+      <!-- Her oyuncunun SAĞINDAKİ (yani ona atılan) yığın -->
+      <div class="discard-area discard-bottom" id="discard-pile-0">
+        <div class="discard-top"><span class="discard-empty">Boş</span></div>
       </div>
-
-      <!-- Okey Bilgisi -->
-      <div class="center-item okey-info-section" id="okey-info">
-        <div class="okey-info-tile" id="okey-info-tile">
-          <!-- Renderer dolduracak -->
-        </div>
-        <span class="okey-label">Okey (Joker)</span>
+      <div class="discard-area discard-right" id="discard-pile-1">
+        <div class="discard-top"><span class="discard-empty">Boş</span></div>
       </div>
-
-      <!-- Atma Destesi -->
-      <div class="center-item discard-pile" id="discard-pile">
-        <div class="discard-top" id="discard-top">
-          <span class="discard-empty">Boş</span>
-        </div>
-        <span class="discard-label">Atılan Taşlar</span>
+      <div class="discard-area discard-top" id="discard-pile-2">
+        <div class="discard-top"><span class="discard-empty">Boş</span></div>
+      </div>
+      <div class="discard-area discard-left" id="discard-pile-3">
+        <div class="discard-top"><span class="discard-empty">Boş</span></div>
       </div>
     </div>
 

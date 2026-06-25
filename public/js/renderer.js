@@ -15,12 +15,12 @@ class Renderer {
     this.turnTextEl   = document.getElementById('turn-text');
     this.myOpenSetsEl = document.getElementById('my-open-sets');
 
-    // Rakip panelleri — index sırasına göre eşleme
-    this.opponentSlots = [
-      document.getElementById('opponent-left'),
-      document.getElementById('opponent-top'),
-      document.getElementById('opponent-right')
-    ];
+    this.discardPilesEls = {
+      bottom: document.getElementById('discard-pile-0'),
+      right: document.getElementById('discard-pile-1'),
+      top: document.getElementById('discard-pile-2'),
+      left: document.getElementById('discard-pile-3'),
+    };
   }
 
   /* ═══════════  ANA RENDER  ═══════════ */
@@ -66,13 +66,18 @@ class Renderer {
 
   /* ═══════════  DİĞER OYUNCULAR  ═══════════ */
   renderOtherPlayers() {
-    // Kendi index'imiz hariç diğer oyuncuları slot'lara yerleştir
     const myIdx = this.app.playerIndex;
-    const count = this.app.players.length;
-    let slotIdx = 0;
+    if (myIdx === -1) return; // İzleyici veya henüz katılmamış
 
-    // Önce tüm slotları temizle
-    this.opponentSlots.forEach(slot => {
+    const relativeSlots = {
+      right: document.getElementById('player-right'),
+      top: document.getElementById('player-top'),
+      left: document.getElementById('player-left'),
+    };
+
+    // Sıfırla
+    Object.values(relativeSlots).forEach(slot => {
+      if (!slot) return;
       slot.querySelector('.op-name').textContent = '—';
       slot.querySelector('.op-tile-count').textContent = '0';
       slot.querySelector('.op-tiles').innerHTML = '';
@@ -80,33 +85,27 @@ class Renderer {
       slot.classList.remove('is-turn');
     });
 
-    for (let i = 0; i < count; i++) {
-      if (i === myIdx) continue;
-      if (slotIdx >= 3) break;
+    // Her bir relative pozisyona düşen mutlak (absolute) index'i bul
+    const positions = {
+      right: (myIdx + 1) % 4,
+      top: (myIdx + 2) % 4,
+      left: (myIdx + 3) % 4,
+    };
 
-      const player = this.app.players[i];
-      const slot = this.opponentSlots[slotIdx];
+    for (const [posName, absIdx] of Object.entries(positions)) {
+      const player = this.app.players[absIdx];
+      const slot = relativeSlots[posName];
+      if (!slot || !player) continue;
 
-      if (!slot || !player) {
-        slotIdx++;
-        continue;
-      }
-
-      // İsim ve taş sayısı
-      slot.querySelector('.op-name').textContent = player.name || `Oyuncu ${i + 1}`;
-
-      // Taş sayısını hesapla (eğer hand bilgisi yoksa tahmini)
-      const tileCount = player.tileCount || 14;
+      slot.querySelector('.op-name').textContent = player.name || `Oyuncu ${absIdx + 1}`;
+      
+      const tileCount = player.tileCount || 0;
       slot.querySelector('.op-tile-count').textContent = tileCount;
 
-      // Sıra bu oyuncuda mı
-      if (this.app.currentTurn === i) {
+      if (this.app.currentTurn === absIdx) {
         slot.classList.add('is-turn');
-      } else {
-        slot.classList.remove('is-turn');
       }
 
-      // Yüzü kapalı taşlar (maksimum 15 göster, kompakt)
       const tilesContainer = slot.querySelector('.op-tiles');
       tilesContainer.innerHTML = '';
       const showCount = Math.min(tileCount, 18);
@@ -116,10 +115,9 @@ class Renderer {
         tilesContainer.appendChild(miniBack);
       }
 
-      // Açık perler
       const openSetsContainer = slot.querySelector('.op-open-sets');
       openSetsContainer.innerHTML = '';
-      const sets = this.app.openSets[i];
+      const sets = this.app.openSets[absIdx];
       if (sets && sets.length > 0) {
         sets.forEach(set => {
           const groupEl = document.createElement('div');
@@ -130,8 +128,6 @@ class Renderer {
           openSetsContainer.appendChild(groupEl);
         });
       }
-
-      slotIdx++;
     }
   }
 
@@ -163,19 +159,37 @@ class Renderer {
       this.okeyInfoEl.appendChild(okeyDisplay);
     }
 
-    // Atılan taş (en üstteki)
-    this.discardTopEl.innerHTML = '';
-    if (this.app.discardTop) {
-      const discardEl = this.createTileElement(this.app.discardTop);
-      discardEl.style.cursor = 'pointer';
-      this.discardTopEl.appendChild(discardEl);
-      this.discardTopEl.style.border = 'none';
-    } else {
-      const emptySpan = document.createElement('span');
-      emptySpan.className = 'discard-empty';
-      emptySpan.textContent = 'Boş';
-      this.discardTopEl.appendChild(emptySpan);
-      this.discardTopEl.style.border = '2px dashed rgba(255, 255, 255, 0.15)';
+    // 4 Çöp yığınını render et (discardPiles array'i app'ten gelir)
+    const myIdx = this.app.playerIndex;
+    if (myIdx !== -1 && this.app.discardPiles) {
+      const mapping = {
+        left: myIdx,                         // Benim çekeceğim çöp (Solumdaki)
+        bottom: (myIdx + 1) % 4,             // Benim attığım çöp (Sağımdaki)
+        right: (myIdx + 2) % 4,              // Sağdakinin attığı çöp
+        top: (myIdx + 3) % 4                 // Karşıdakinin attığı çöp
+      };
+
+      for (const [pos, absIdx] of Object.entries(mapping)) {
+        const pileData = this.app.discardPiles[absIdx];
+        const el = this.discardPilesEls[pos];
+        if (!el) continue;
+        
+        const topContainer = el.querySelector('.discard-top');
+        topContainer.innerHTML = '';
+        
+        if (pileData && pileData.count > 0 && pileData.topTile) {
+          const discardTileEl = this.createTileElement(pileData.topTile);
+          discardTileEl.style.cursor = pos === 'left' ? 'pointer' : 'default'; // Sadece soldakinden çekebiliriz
+          topContainer.appendChild(discardTileEl);
+          el.style.border = 'none';
+        } else {
+          const emptySpan = document.createElement('span');
+          emptySpan.className = 'discard-empty';
+          emptySpan.textContent = 'Boş';
+          topContainer.appendChild(emptySpan);
+          el.style.border = '2px dashed rgba(255, 255, 255, 0.15)';
+        }
+      }
     }
   }
 
@@ -189,8 +203,16 @@ class Renderer {
     // Taş Çek butonları — sıram ve henüz çekmemişsem aktif
     const drawPileBtn = document.getElementById('btn-draw-pile');
     const drawDiscardBtn = document.getElementById('btn-draw-discard');
+    
+    // Çöp yığınından çekilebilir mi? (Sadece kendi solumuzdaki yığında taş varsa)
+    let canDrawFromDiscard = false;
+    if (this.app.playerIndex !== -1 && this.app.discardPiles) {
+      const myLeftPile = this.app.discardPiles[this.app.playerIndex];
+      if (myLeftPile && myLeftPile.count > 0) canDrawFromDiscard = true;
+    }
+
     drawPileBtn.disabled = !(isMyTurn && !hasDrawn);
-    drawDiscardBtn.disabled = !(isMyTurn && !hasDrawn && this.app.discardTop);
+    drawDiscardBtn.disabled = !(isMyTurn && !hasDrawn && canDrawFromDiscard);
 
     // Taş At — sıram, çekmiş olmalıyım, 1 taş seçili olmalı
     const discardBtn = document.getElementById('btn-discard');

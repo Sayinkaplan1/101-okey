@@ -209,6 +209,7 @@ io.on('connection', (socket) => {
         playerIndex: i,
         players: room.players.map(pl => ({ id: pl.id, name: pl.name })),
         pileCount: room.pile.length,
+        discardPiles: room.discardPiles,
         roundNumber: room.roundNumber,
       });
     }
@@ -229,7 +230,7 @@ io.on('connection', (socket) => {
     }
 
     // Çeken oyuncuya çektiği taşı bildir
-    socket.emit('tileDrawn', { tile: result.tile, source, pileCount: room.pile.length });
+    socket.emit('tileDrawn', { tile: result.tile, source, pileCount: room.pile.length, discardPiles: room.discardPiles });
 
     // Sıra bilgisini herkese gönder
     broadcastToRoom(roomCode, 'turnUpdate', {
@@ -257,12 +258,11 @@ io.on('connection', (socket) => {
 
     // Herkese atılan taşı bildir
     broadcastToRoom(roomCode, 'tileDiscarded', {
-      playerId: room.players[playerIndex].id,
-      playerName,
       playerIndex,
       tile: result.tile,
       nextTurn: room.currentTurn,
       pileCount: room.pile.length,
+      discardPiles: room.discardPiles,
     });
 
     // Round bittiyse sonuçları bildir
@@ -448,6 +448,7 @@ io.on('connection', (socket) => {
         playerIndex: i,
         players: room.players.map(pl => ({ id: pl.id, name: pl.name })),
         pileCount: room.pile.length,
+        discardPiles: room.discardPiles,
         roundNumber: room.roundNumber,
       });
     }

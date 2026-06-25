@@ -17,7 +17,7 @@ class App {
     this.hasDrawn = false;
     this.hasOpened = false;
     this.pileCount = 0;
-    this.discardTop = null;
+    this.discardPiles = null;
     this.openSets = {}; // playerIndex → [[tile,...], ...]
 
     // Alt modüller
@@ -110,7 +110,7 @@ class App {
       this.pileCount   = data.pileCount || 0;
       this.hasDrawn    = false;
       this.hasOpened   = false;
-      this.discardTop  = null;
+      this.discardPiles = data.discardPiles || [[], [], [], []];
       this.openSets    = {};
 
       // Oyuncu taş sayılarını ayarla
@@ -140,6 +140,7 @@ class App {
         this.hand.push(data.tile);
       }
       this.pileCount = data.pileCount;
+      if (data.discardPiles) this.discardPiles = data.discardPiles;
       this.hasDrawn = true;
 
       this.renderer.animateTileDraw(data.tile);
@@ -151,12 +152,10 @@ class App {
 
     // Taş atıldı
     this.socket.on('tileDiscarded', (data) => {
-      const discarderId = data.playerId;
-      const isMe = this.players[this.playerIndex]?.id === discarderId;
+      const isMe = data.playerIndex === this.playerIndex;
 
-      // Atılan taşı en üste koy
-      if (data.tile) {
-        this.discardTop = data.tile;
+      if (data.discardPiles) {
+        this.discardPiles = data.discardPiles;
       }
 
       // Sıra güncelle
@@ -183,7 +182,7 @@ class App {
 
       // Rakip taş sayısını güncelle
       if (!isMe) {
-        const discarderIdx = this.players.findIndex(p => p.id === discarderId);
+        const discarderIdx = data.playerIndex;
         if (discarderIdx >= 0 && this.players[discarderIdx]) {
           this.players[discarderIdx].tileCount = Math.max(
             0,

@@ -30,14 +30,14 @@ class GameRoom {
     ];
 
     this.pile = [];            // Çekilecek taş yığını
-    this.discardPile = [];     // Atılan taşlar (en üstteki çekilebilir)
+    this.discardPiles = [[], [], [], []]; // 4 oyuncunun sağına atılan taşlar
     this.indicator = null;     // Gösterge taşı
     this.okeyInfo = null;      // Okey bilgisi { color, number }
     this.currentTurn = 0;      // Sıradaki oyuncu index'i
     this.phase = 'waiting';    // 'waiting' | 'playing' | 'roundEnd'
     this.hasDrawnThisTurn = false; // Bu turda taş çekildi mi
     this.roundNumber = 1;      // Kaçıncı round
-    this.lastDiscardedTile = null; // Son atılan taş (görüntüleme için)
+    this.roundNumber = 1;      // Kaçıncı round
   }
 
   // ─────────────── Oyuncu Yönetimi ───────────────
@@ -158,7 +158,7 @@ class GameRoom {
     }
 
     this.pile = pile;
-    this.discardPile = [];
+    this.discardPiles = [[], [], [], []];
     this.indicator = indicator;
     this.okeyInfo = okeyInfo;
     this.currentTurn = 0;
@@ -166,7 +166,6 @@ class GameRoom {
 
     // İlk oyuncu 22 taş aldı, çekmeden atacak → hasDrawnThisTurn = true
     this.hasDrawnThisTurn = true;
-    this.lastDiscardedTile = null;
 
     return { success: true };
   }
@@ -201,15 +200,12 @@ class GameRoom {
     let tile;
 
     if (source === 'discard') {
-      // Çöp yığınından çek (en üstteki taş)
-      if (this.discardPile.length === 0) {
+      // Çöp yığınından çek (sadece solumuzdaki çöp, yani kendi indeksimizdeki)
+      const myLeftPile = this.discardPiles[playerIndex];
+      if (myLeftPile.length === 0) {
         return { success: false, reason: 'Çöp yığını boş.' };
       }
-      tile = this.discardPile.pop();
-      this.lastDiscardedTile =
-        this.discardPile.length > 0
-          ? this.discardPile[this.discardPile.length - 1]
-          : null;
+      tile = myLeftPile.pop();
     } else if (source === 'pile') {
       // Yığından çek
       if (this.pile.length === 0) {
@@ -238,17 +234,29 @@ class GameRoom {
    * @private
    */
   _reshufflePile() {
-    if (this.discardPile.length <= 1) {
+    let totalDiscarded = 0;
+    this.discardPiles.forEach(p => totalDiscarded += p.length);
+    
+    // Karıştırılacak yeterli taş var mı (her yığının en üstündeki bırakılacak)
+    // 4 yığının üstlerindeki hariç toplam taş
+    let availableToShuffle = 0;
+    this.discardPiles.forEach(p => availableToShuffle += Math.max(0, p.length - 1));
+
+    if (availableToShuffle <= 0) {
       return false; // Karıştıracak yeterli taş yok
     }
 
-    // En üstteki çöp taşını koru
-    const topDiscard = this.discardPile.pop();
+    // En üstteki taşları koru, diğerlerini topla
+    const newPile = [];
+    for (let i = 0; i < 4; i++) {
+      if (this.discardPiles[i].length > 1) {
+        const topTile = this.discardPiles[i].pop(); // Üsttekini al
+        newPile.push(...this.discardPiles[i]); // Kalanları yeni yığına ekle
+        this.discardPiles[i] = [topTile]; // Üsttekini geri koy
+      }
+    }
 
-    // Geri kalanını yığına al ve karıştır
-    this.pile = [...this.discardPile];
-    this.discardPile = [topDiscard];
-    this.lastDiscardedTile = topDiscard;
+    this.pile = newPile;
 
     // Fisher-Yates karıştırma
     for (let i = this.pile.length - 1; i > 0; i--) {
@@ -293,10 +301,10 @@ class GameRoom {
       return { success: false, reason: 'Bu taş elinizde yok.' };
     }
 
-    // Taşı elden çıkar
+    // Taşı elden çıkar ve sağdaki oyuncunun soluna (atma destesine) ekle
     const tile = player.hand.splice(tileIndex, 1)[0];
-    this.discardPile.push(tile);
-    this.lastDiscardedTile = tile;
+    const targetPileIndex = (playerIndex + 1) % 4;
+    this.discardPiles[targetPileIndex].push(tile);
 
     // El bitti mi kontrol et (tüm taşlar setlere yatırıldı ve son taş atıldı)
     const roundEnd = this.checkRoundEnd(playerIndex);
@@ -603,8 +611,10 @@ class GameRoom {
       indicator: this.indicator,
       okeyInfo: this.okeyInfo,
       pileCount: this.pile.length,
-      discardPileTop: this.lastDiscardedTile,
-      discardPileCount: this.discardPile.length,
+      discardPiles: this.discardPiles.map(pile => ({
+        topTile: pile.length > 0 ? pile[pile.length - 1] : null,
+        count: pile.length
+      })),
       hasDrawnThisTurn: this.hasDrawnThisTurn,
     };
   }

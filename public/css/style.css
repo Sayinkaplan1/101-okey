@@ -536,15 +536,21 @@ body::after {
   gap: var(--spacing-md);
 }
 
-/* ── Diğer Oyuncular ── */
-.other-players-area {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--spacing-md);
+/* ── Masa Düzeni (Square Table) ── */
+.table-container {
+  position: relative;
+  flex: 1;
   width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
 }
 
-.other-player {
+.table-player {
+  position: absolute;
   background: var(--glass-bg);
   backdrop-filter: blur(14px);
   border: 1px solid var(--glass-border);
@@ -552,10 +558,35 @@ body::after {
   padding: var(--spacing-sm) var(--spacing-md);
   transition: var(--transition-base);
   min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
 }
-.other-player.is-turn {
+.table-player.is-turn {
   border-color: var(--accent-gold);
   box-shadow: 0 0 20px var(--accent-gold-dim);
+}
+
+.pos-top {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.pos-left {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  transform-origin: center left;
+  margin-left: 40px;
+}
+.pos-right {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center right;
+  margin-right: 40px;
 }
 
 .op-header {
@@ -654,13 +685,19 @@ body::after {
 }
 
 /* ── Masa Merkezi ── */
-.table-center {
+.table-center-board {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-xl);
   padding: var(--spacing-lg) var(--spacing-md);
-  flex-wrap: wrap;
+  background: rgba(0,0,0,0.2);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
 .center-item {
@@ -743,11 +780,26 @@ body::after {
   position: relative;
 }
 
-/* Atma destesi */
-.discard-pile {
+/* Çöp yığınları (4 kenar) */
+.discard-area {
+  position: absolute;
+  width: 52px;
+  height: 70px;
+  border-radius: var(--tile-radius);
+  border: 2px dashed rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: var(--transition-base);
 }
+.discard-area:hover {
+  border-color: rgba(255,255,255,0.4);
+}
+.discard-bottom { bottom: 0; right: 20%; }
+.discard-right { right: 0; top: 20%; transform: rotate(-90deg); }
+.discard-top { top: 0; left: 20%; }
+.discard-left { left: 0; bottom: 20%; transform: rotate(90deg); }
 .discard-pile:hover {
   transform: translateY(-3px);
 }
@@ -927,39 +979,27 @@ body::after {
 /* Taş rafı */
 .tile-rack-wrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: hidden;
   padding: var(--spacing-sm) 0;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,215,0,0.3) transparent;
-}
-.tile-rack-wrapper::-webkit-scrollbar {
-  height: 6px;
-}
-.tile-rack-wrapper::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0.2);
-  border-radius: 3px;
-}
-.tile-rack-wrapper::-webkit-scrollbar-thumb {
-  background: rgba(255,215,0,0.3);
-  border-radius: 3px;
-}
-.tile-rack-wrapper::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,215,0,0.5);
+
 }
 
 .tile-rack {
   display: flex;
-  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 6px;
   padding: var(--spacing-md);
   background: var(--glass-bg);
   backdrop-filter: blur(14px);
   border: 1px solid var(--glass-border);
   border-radius: 14px;
-  min-height: 90px;
-  align-items: center;
-  width: fit-content;
-  min-width: 100%;
+  min-height: 160px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
 }
 
 /* Kontrol çubuğu */
